@@ -1,5 +1,5 @@
 # MobileApplications
-Mobile Application Project - 2017
+Mobile Application Project - 2017/2018
 
 # Shopping List Manager
 
