@@ -1,58 +1,71 @@
 package com.example.langchristian96.androidshopping.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
+import java.sql.Date;
+
+
 /**
  * Created by langchristian96 on 11/9/2017.
  */
 
+@Entity(tableName = "shopping_list")
 public class ShoppingList {
-    private String name;
-    private String description;
+    @PrimaryKey(autoGenerate = true)
+    private Long id;
+    private String slName;
+    private String slDescription;
+    private int buyHour;
+    private int buyMinute;
 
+    public int getBuyHour() {
+        return buyHour;
+    }
+
+    public void setBuyHour(int buyHour) {
+        this.buyHour = buyHour;
+    }
+
+    public int getBuyMinute() {
+        return buyMinute;
+    }
+
+    public void setBuyMinute(int buyMinute) {
+        this.buyMinute = buyMinute;
+    }
+
+    @Ignore
     public ShoppingList(String name, String description) {
-        this.name = name;
-        this.description = description;
+        this.slName = name;
+        this.slDescription = description;
     }
 
-    public String getName() {
-        return name;
+    public ShoppingList() {
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Long getId() {
+        return id;
     }
 
-    public String getDescription() {
-        return description;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public String getSlName() {
+        return slName;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ShoppingList that = (ShoppingList) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return description != null ? description.equals(that.description) : that.description == null;
-
+    public void setSlName(String slName) {
+        this.slName = slName;
     }
 
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        return result;
+    public String getSlDescription() {
+        return slDescription;
     }
 
-    @Override
-    public String toString() {
-        return "ShoppingList{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+    public void setSlDescription(String slDescription) {
+        this.slDescription = slDescription;
     }
 }

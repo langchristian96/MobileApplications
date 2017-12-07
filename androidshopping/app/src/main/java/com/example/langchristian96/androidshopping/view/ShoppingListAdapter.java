@@ -67,7 +67,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.mTextView.setText(""+(position+1)+"-"+ shoppingLists.get(position).getName());
+        holder.mTextView.setText(""+(position+1)+"-"+ shoppingLists.get(position).getSlName());
 
     }
 
