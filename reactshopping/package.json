@@ -9,7 +9,10 @@
 	"dependencies": {
 		"react": "16.0.0",
 		"react-native": "0.50.3",
-		"react-native-send-intent": "^1.0.21"
+		"react-native-datepicker": "^1.6.0",
+		"react-native-pathjs-charts": "0.0.33",
+		"react-native-send-intent": "^1.0.21",
+		"react-native-time-picker": "^0.1.2"
 	},
 	"devDependencies": {
 		"babel-jest": "21.2.0",
