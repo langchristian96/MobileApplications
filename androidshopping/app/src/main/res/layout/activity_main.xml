@@ -59,6 +59,15 @@
         android:id="@+id/statistics_layout"
         android:layout_below="@+id/statisticsButton">
 
+        <Button
+            android:text="Log out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/statisticsButton"
+            android:layout_toRightOf="@+id/editText2"
+            android:layout_toEndOf="@+id/editText2"
+            android:layout_marginTop="85dp"
+            android:id="@+id/logoutButton" />
     </RelativeLayout>
 
     <Button

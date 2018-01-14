@@ -1,13 +1,20 @@
 package com.example.langchristian96.androidshopping.repository;
 
+import android.util.Log;
+
 import com.example.langchristian96.androidshopping.model.Product;
 import com.example.langchristian96.androidshopping.model.ShoppingList;
+import com.example.langchristian96.androidshopping.utils.Globals;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.function.Predicate;
 
 /**
  * Created by langchristian96 on 12/6/2017.
@@ -15,9 +22,11 @@ import java.util.function.Predicate;
 
 public class ProductRepository {
 
+    private static final String TAG = "ProductRepository";
     private List<Product> repo;
     private final AppDatabase appDatabase;
     private Executor executor = Executors.newSingleThreadExecutor();
+    private DatabaseReference productsDatabase;
 
     public ProductRepository(final AppDatabase appDatabase) {
         this.repo = new ArrayList<>();
@@ -39,13 +48,32 @@ public class ProductRepository {
 //                add(p1);
 //                add(p2);
 //                add(p3);
+
+
+                GenericTypeIndicator<List<Product>> genericTypeIndicator = new GenericTypeIndicator<List<Product>>() {};
+                productsDatabase = Globals.mFirebaseInstance.getReference("products");
+                productsDatabase.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        GenericTypeIndicator<List<Product>> genericTypeIndicator = new GenericTypeIndicator<List<Product>>() {};
+
+                        repo = (List<Product>) dataSnapshot.getValue(genericTypeIndicator);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "Failed to read products value", databaseError.toException());
+                    }
+                });
             }
         });
+
     }
+
 
     public void add(final Product e) {
         repo.add(e);
-
+        productsDatabase.setValue(repo);
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -72,6 +100,8 @@ public class ProductRepository {
                 appDatabase.productDao().update(toUpdateList);
             }
         });
+
+        productsDatabase.setValue(repo);
     }
 
     public void delete(final Product product) {
@@ -89,6 +119,8 @@ public class ProductRepository {
                 break;
             }
         }
+
+        productsDatabase.setValue(repo);
     }
 
     public List<Product> getAll() {

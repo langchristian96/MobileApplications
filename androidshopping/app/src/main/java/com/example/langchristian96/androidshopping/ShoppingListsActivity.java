@@ -16,6 +16,7 @@ public class ShoppingListsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Globals.currentActivity = this;
         setContentView(R.layout.activity_shopping_lists);
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
@@ -28,6 +29,7 @@ public class ShoppingListsActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new ShoppingListAdapter(Globals.shoppingListRepository.getAll(), ShoppingListsActivity.this);
+        Globals.shoppingListsAdapter = (ShoppingListAdapter) mAdapter;
         mRecyclerView.setAdapter(mAdapter);
     }
 }

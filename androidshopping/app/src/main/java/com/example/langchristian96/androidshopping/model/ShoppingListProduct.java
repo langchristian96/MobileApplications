@@ -25,4 +25,24 @@ public class ShoppingListProduct {
     public void setProductId(Long productId) {
         this.productId = productId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ShoppingListProduct that = (ShoppingListProduct) o;
+
+        if (shoppingListId != null ? !shoppingListId.equals(that.shoppingListId) : that.shoppingListId != null)
+            return false;
+        return productId != null ? productId.equals(that.productId) : that.productId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = shoppingListId != null ? shoppingListId.hashCode() : 0;
+        result = 31 * result + (productId != null ? productId.hashCode() : 0);
+        return result;
+    }
 }

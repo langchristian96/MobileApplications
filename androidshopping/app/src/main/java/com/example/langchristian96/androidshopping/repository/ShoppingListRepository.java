@@ -1,10 +1,17 @@
 package com.example.langchristian96.androidshopping.repository;
 
 import android.arch.persistence.room.Room;
+import android.util.Log;
 
 import com.example.langchristian96.androidshopping.model.Product;
 import com.example.langchristian96.androidshopping.model.ShoppingList;
 import com.example.langchristian96.androidshopping.model.ShoppingListProduct;
+import com.example.langchristian96.androidshopping.utils.Globals;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +24,81 @@ import java.util.concurrent.Executors;
  */
 
 public class ShoppingListRepository {
+    private static final String TAG = "ShoppingListRepository";
     private List<ShoppingList> repo;
+    private List<ShoppingListProduct> shoppingListProducts;
     private final AppDatabase appDatabase;
     private Executor executor = Executors.newSingleThreadExecutor();
+    private DatabaseReference shoppingListsDatabase;
+    private DatabaseReference shoppingListsProductsDatabase;
 
     public ShoppingListRepository(final AppDatabase appDatabase) {
         this.repo = new ArrayList<>();
+        Globals.mFirebaseInstance.getReference("admin").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String adminUser = dataSnapshot.getValue(String.class);
+                Globals.administrator = adminUser;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         this.appDatabase = appDatabase;
         executor.execute(new Runnable() {
 
             @Override
             public void run() {
                 repo.addAll(appDatabase.shoppingListDao().getAll());
+            }
+        });
+        shoppingListsDatabase = Globals.mFirebaseInstance.getReference("shoppinglists");
+        shoppingListsProductsDatabase = Globals.mFirebaseInstance.getReference("shoppinglistsproducts");
+
+        shoppingListsDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<List<ShoppingList>> genericTypeIndicator = new GenericTypeIndicator<List<ShoppingList>>() {};
+                repo = (List<ShoppingList>) dataSnapshot.getValue(genericTypeIndicator);
+                if(Globals.shoppingListsAdapter!= null) {
+                    Globals.shoppingListsAdapter.setDataset(repo);
+                    Globals.shoppingListsAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Failed to read shopping lists value", databaseError.toException());
+            }
+        });
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                shoppingListProducts = appDatabase.shoppingListProductDao().getAll();
+                shoppingListsProductsDatabase.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        GenericTypeIndicator<List<ShoppingListProduct>> genericTypeIndicator = new GenericTypeIndicator<List<ShoppingListProduct>>() {};
+                        List<ShoppingListProduct> shoppingListProducts = (List<ShoppingListProduct>) dataSnapshot.getValue(genericTypeIndicator);
+                        for(final ShoppingListProduct slp: shoppingListProducts) {
+                            if(!shoppingListProducts.contains(slp)) {
+                                executor.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        appDatabase.shoppingListProductDao().insertAll(slp);
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "Failed to read shopping lists - products value", databaseError.toException());
+                    }
+                });
             }
         });
     }
@@ -42,6 +112,7 @@ public class ShoppingListRepository {
                 appDatabase.shoppingListDao().insertAll(e);
             }
         });
+        shoppingListsDatabase.setValue(repo);
     }
 
     public void update(final ShoppingList e) {
@@ -62,6 +133,7 @@ public class ShoppingListRepository {
                 appDatabase.shoppingListDao().update(toUpdateList);
             }
         });
+        shoppingListsDatabase.setValue(repo);
     }
 
     public void delete(final ShoppingList shoppingList) {
@@ -79,6 +151,7 @@ public class ShoppingListRepository {
                 break;
             }
         }
+        shoppingListsDatabase.setValue(repo);
     }
 
     public List<ShoppingList> getAll() {
@@ -137,6 +210,8 @@ public class ShoppingListRepository {
                 appDatabase.shoppingListProductDao().insertAll(shoppingListProduct);
             }
         });
+        shoppingListProducts.add(shoppingListProduct);
+        shoppingListsProductsDatabase.setValue(shoppingListProducts);
         return true;
     }
 }

@@ -68,4 +68,29 @@ public class ShoppingList {
     public void setSlDescription(String slDescription) {
         this.slDescription = slDescription;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ShoppingList that = (ShoppingList) o;
+
+        if (buyHour != that.buyHour) return false;
+        if (buyMinute != that.buyMinute) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (slName != null ? !slName.equals(that.slName) : that.slName != null) return false;
+        return slDescription != null ? slDescription.equals(that.slDescription) : that.slDescription == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (slName != null ? slName.hashCode() : 0);
+        result = 31 * result + (slDescription != null ? slDescription.hashCode() : 0);
+        result = 31 * result + buyHour;
+        result = 31 * result + buyMinute;
+        return result;
+    }
 }

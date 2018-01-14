@@ -45,6 +45,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     private Button addButton;
     private Button allListsButton;
+    private Button logoutButton;
     private EditText nameEditText;
     private EditText descriptionEditText;
 
@@ -52,7 +53,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Globals.currentActivity = this;
         setContentView(R.layout.activity_main);
+        this.logoutButton = (Button) findViewById(R.id.logoutButton);
         this.addButton = (Button)findViewById(R.id.button);
         this.allListsButton = (Button) findViewById(R.id.button2);
         this.nameEditText = (EditText) findViewById(R.id.editText);
@@ -85,6 +88,16 @@ public class MainActivity extends AppCompatActivity {
                 newFragment.show(getSupportFragmentManager(), "timePicker");
             }
         });
+        this.logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Globals.logout();
+                Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         Button statisticsButton = (Button) findViewById(R.id.statisticsButton);
         statisticsButton.setOnClickListener(new View.OnClickListener(){
 

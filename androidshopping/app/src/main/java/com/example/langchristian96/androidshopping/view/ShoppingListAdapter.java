@@ -41,6 +41,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         this.context = context;
     }
 
+    public void setDataset(List<ShoppingList> dataset) {
+        this.shoppingLists = dataset;
+    }
+
     // Create new views (invoked by the layout manager)
     @Override
     public ShoppingListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,

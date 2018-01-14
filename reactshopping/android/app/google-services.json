@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "261508763717",
+    "firebase_url": "https://reactshopping-40c3c.firebaseio.com",
+    "project_id": "reactshopping-40c3c",
+    "storage_bucket": "reactshopping-40c3c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261508763717:android:178c7ba4bed54111",
+        "android_client_info": {
+          "package_name": "com.reactshopping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261508763717-80h7tej8okavu35cr0n6opg9efm1ml44.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfqvpK6hYe-1KSz9ELCUsM4U5QmUwl_Mc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

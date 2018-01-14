@@ -12,7 +12,8 @@
 		"react-native-datepicker": "^1.6.0",
 		"react-native-pathjs-charts": "0.0.33",
 		"react-native-send-intent": "^1.0.21",
-		"react-native-time-picker": "^0.1.2"
+		"react-native-time-picker": "^0.1.2",
+		"react-native-firebase": "latest"
 	},
 	"devDependencies": {
 		"babel-jest": "21.2.0",

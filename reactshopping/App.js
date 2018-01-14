@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import Main from "./Main";
 import SeeAll from "./SeeAll";
+import firebase from 'react-native-firebase';
+import {Login} from "./Login";
 
 const instructions = Platform.select({
     ios: 'Press Cmd+R to reload,\n' +
@@ -34,7 +36,7 @@ export default class App extends Component<{}> {
         this.crtindex = 0;
         this.state = {shoppingLists: "", component: ""};
         this.state.shoppingLists = [];
-        this.comp=<View/>;
+        this.comp=<Login login={this.loginUser.bind(this)}/>;
         // this.comp = <Main change={this.changeComponent.bind(this)} update={this.updateShoppingList.bind(this)}
         //                   add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)}/>;
         this.state.component = this.comp;
@@ -46,6 +48,8 @@ export default class App extends Component<{}> {
             else {
                 AsyncStorage.setItem('crtindex', JSON.stringify(this.crtindex));
             }
+            firebase.database().ref('crtindex').set(this.crtindex);
+
         });
         // AsyncStorage.setItem('shoppingLists',JSON.stringify(this.state.shoppingLists));
         AsyncStorage.getItem('shoppingLists').then((value, err) => {
@@ -54,14 +58,13 @@ export default class App extends Component<{}> {
                 console.log("Expected sls set: ",value);
                 this.setState({shoppingLists: JSON.parse(value)});
                 console.log("New main render list",this.state.shoppingLists);
-                this.newComp = <Main change={this.changeComponent.bind(this)} update={this.updateShoppingList.bind(this)}
-                                    add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)}/>;
-                this.changeComponent(this.newComp);
+                firebase.database().ref('shoppingLists').set(JSON.parse(value));
             }
             else {
                 console.log("sl not set");
                 this.setState({shoppingLists: []});
                 AsyncStorage.setItem('shoppingLists',JSON.stringify(this.state.shoppingLists));
+                firebase.database().ref('shoppingLists').set([]);
             }
         });
     }
@@ -70,12 +73,21 @@ export default class App extends Component<{}> {
         return this.state.shoppingLists;
     }
 
+    loginUser(username) {
+        console.log("login function");
+        this.newComp = <Main change={this.changeComponent.bind(this)} update={this.updateShoppingList.bind(this)}
+                             add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)}/>;
+        this.changeComponent(this.newComp);
+    }
+
     updateShoppingList(index, elem) {
         let shoppingLists = this.state.shoppingLists;
         elem['id'] = shoppingLists[index]['id'];
         shoppingLists[index] = elem;
         this.setState({shoppingLists: shoppingLists});
         AsyncStorage.setItem('shoppingLists',JSON.stringify(shoppingLists));
+        myClonedArray  = Object.assign([], shoppingLists);
+        firebase.database().ref('shoppingLists').set(myClonedArray);
     }
 
     deleteShoppingList(index) {
@@ -84,6 +96,8 @@ export default class App extends Component<{}> {
         shoppingLists.splice(index,1)
         this.setState({shoppingLists: shoppingLists});
         AsyncStorage.setItem('shoppingLists',JSON.stringify(shoppingLists));
+        myClonedArray  = Object.assign([], shoppingLists);
+        firebase.database().ref('shoppingLists').set(myClonedArray);
     }
 
     addShoppingList(elem) {
@@ -95,6 +109,8 @@ export default class App extends Component<{}> {
         AsyncStorage.setItem('shoppingLists',JSON.stringify(shoppingLists));
         this.crtindex++;
         AsyncStorage.setItem('crtindex',JSON.stringify(this.crtindex));
+        myClonedArray  = Object.assign([], shoppingLists);
+        firebase.database().ref('shoppingLists').set(myClonedArray);
     }
 
     changeComponent(comp) {

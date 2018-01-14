@@ -25,9 +25,11 @@ import static android.R.id.list;
 public class EditShoppingListActivity extends AppCompatActivity {
     private int position;
     private ShoppingList crtShoppingList;
+    private Button deleteButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Globals.currentActivity = this;
         setContentView(R.layout.activity_edit_shopping_list);
         Bundle b = getIntent().getExtras();
         position = b.getInt("position")-1;
@@ -43,7 +45,7 @@ public class EditShoppingListActivity extends AppCompatActivity {
         TextView buyTime = (TextView) findViewById(R.id.buyTime);
         buyTime.setText(""+crtShoppingList.getBuyHour()+":"+crtShoppingList.getBuyMinute());
         Button updateButton = (Button) findViewById(R.id.updateButton);
-        Button deleteButton = (Button) findViewById(R.id.deleteButton);
+        deleteButton = (Button) findViewById(R.id.deleteButton);
         final ShoppingListRepository repo = Globals.shoppingListRepository;
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,5 +95,17 @@ public class EditShoppingListActivity extends AppCompatActivity {
                 System.out.println(p);
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(!Globals.administrator.equals(Globals.user)) {
+            deleteButton.setVisibility(View.GONE);
+        }
+        else {
+            deleteButton.setVisibility(View.VISIBLE);
+        }
     }
 }
