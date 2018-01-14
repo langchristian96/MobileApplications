@@ -4,6 +4,8 @@ import SeeAll from "./SeeAll";
 import {Linking} from 'react-native';
 import DatePicker from 'react-native-datepicker'
 import {Bar} from 'react-native-pathjs-charts';
+import {Login} from "./Login";
+import firebase from 'react-native-firebase';
 
 export default class Main extends Component<{}> {
 
@@ -14,8 +16,9 @@ export default class Main extends Component<{}> {
         const chartData = this.getNameMap();//this.testChartData();//this.computeChartInput(this.props.list());
         this.state = {name: 'Shopping List name', description: 'Shopping List Description', time: '',
             chartData: chartData};
+        this.loginComp = <Login login={this.props.login}/>;
         this.comp =
-            <SeeAll change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete} isAdmin={this.props.isAdmin}/>
+            <SeeAll change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete} isAdmin={this.props.isAdmin} login={this.props.login} addProduct={this.props.addProduct}/>;
     }
 
 
@@ -116,9 +119,18 @@ export default class Main extends Component<{}> {
 
 
     addShoppingList() {
-        let shoppingList = {name: this.state.name, description: this.state.description, time:this.state.time};
-        this.props.add(shoppingList);
-        this.sendMail();
+        new Promise((resolve, reject) => {
+            let shoppingList = {name: this.state.name, description: this.state.description, time:this.state.time};
+            this.props.add(shoppingList);
+            this.sendMail();
+        }).catch(
+            (reason)=>{
+                console.log('Rejected promise:' + reason);
+            }
+        );
+        // let shoppingList = {name: this.state.name, description: this.state.description, time:this.state.time};
+        // this.props.add(shoppingList);
+        // this.sendMail();
 
     }
 
@@ -188,6 +200,16 @@ export default class Main extends Component<{}> {
                     title="See all"
                     color="#841584"
                     accessibilityLabel="Add shopping list"
+                />
+
+                <Button
+                    onPress={() => {
+                        this.props.change(this.loginComp);
+                        firebase.auth().signOut();
+                    }}
+                    title="Log out"
+                    color="#841584"
+                    accessibilityLabel="Log out"
                 />
                 <View>
                     <Bar data={this.state.chartData} options={this.options} accessorKey='v'/>

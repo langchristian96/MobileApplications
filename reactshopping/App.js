@@ -45,6 +45,9 @@ export default class App extends Component<{}> {
         // this.comp = <Main change={this.changeComponent.bind(this)} update={this.updateShoppingList.bind(this)}
         //                   add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)}/>;
         this.state.component = this.comp;
+        firebase.messaging().onMessage(function(payload) {
+            alert("Message received: " + payload.fcm.body);
+        })
         let xx = this;
         firebase.database().ref('crtindex').on('value', (dataSnapshot)=>{
             xx.crtindex = dataSnapshot.val();
@@ -69,6 +72,7 @@ export default class App extends Component<{}> {
         firebase.database().ref('shoppingLists').on('value', (dataSnapshot)=>{
             console.log("NEW UPDATE SL");
             let comp = <View/>;
+            let sls = dataSnapshot.val();
             xx.setState({shoppingLists: dataSnapshot.val()});
             AsyncStorage.setItem('shoppingLists',dataSnapshot.val());
         });
@@ -96,7 +100,8 @@ export default class App extends Component<{}> {
         this.crtuser = username;
         console.log("login function");
         this.newComp = <Main change={this.changeComponent.bind(this)} update={this.updateShoppingList.bind(this)}
-                             add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)} isAdmin={this.isAdmin.bind(this)}/>;
+                             add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)} isAdmin={this.isAdmin.bind(this)} login={this.loginUser.bind(this)}
+                             addProduct={this.addProductToList.bind(this)}/>;
         this.changeComponent(this.newComp);
     }
 
@@ -108,6 +113,19 @@ export default class App extends Component<{}> {
         let shoppingLists = this.state.shoppingLists;
         elem['id'] = shoppingLists[index]['id'];
         shoppingLists[index] = elem;
+        this.setState({shoppingLists: shoppingLists});
+        AsyncStorage.setItem('shoppingLists',JSON.stringify(shoppingLists));
+        myClonedArray  = Object.assign([], shoppingLists);
+        firebase.database().ref('shoppingLists').child(''+index).set(elem);
+    }
+
+    addProductToList(index, product) {
+        let shoppingLists = this.state.shoppingLists;
+        if(shoppingLists[index].products == undefined) {
+            shoppingLists[index].products = [];
+        }
+        shoppingLists[index].products.push(product);
+
         this.setState({shoppingLists: shoppingLists});
         AsyncStorage.setItem('shoppingLists',JSON.stringify(shoppingLists));
         myClonedArray  = Object.assign([], shoppingLists);
@@ -133,6 +151,7 @@ export default class App extends Component<{}> {
         AsyncStorage.setItem('shoppingLists',JSON.stringify(shoppingLists));
         this.crtindex++;
         AsyncStorage.setItem('crtindex',JSON.stringify(this.crtindex));
+        firebase.database().ref('crtindex').set(this.crtindex);
         myClonedArray  = Object.assign([], shoppingLists);
         firebase.database().ref('shoppingLists').set(myClonedArray);
     }

@@ -2,15 +2,43 @@ import React, {Component} from 'react';
 import {Button, FlatList, ListItem, ListView, Text, TextInput, TouchableHighlight, View, Alert} from "react-native";
 import Main from "./Main";
 import {Bar} from 'react-native-pathjs-charts';
+import firebase from 'react-native-firebase';
 
 export default class Edit extends Component<{}> {
     constructor(props) {
         super(props);
         this.itemIndex = this.props.elem.split("-")[0] - 1;
-        this.list = this.props.list;
-        this.state = {description: this.list[this.itemIndex].description, name: this.list[this.itemIndex].name, time: this.list[this.itemIndex].time};
+        this.initialList = this.props.list;
+        this.state = {description: this.initialList[this.itemIndex].description, name: this.initialList[this.itemIndex].name, time: this.initialList[this.itemIndex].time, product: "", productList: "", list: this.props.list};
+
+        if(this.state.list[this.itemIndex].products != undefined) {
+            this.state.productList += "Product List:";
+            let products = this.state.list[this.itemIndex].products;
+            for(j=0;j<products.length;j++) {
+                this.state.productList += products[j];
+                this.state.productList += " ";
+            }
+        }
+
+
+        firebase.database().ref('shoppingLists').on('value', (dataSnapshot)=>{
+            console.log("NEW UPDATE SL");
+            let xx = this;
+            let newPL = "";
+            xx.setState({list: dataSnapshot.val()});
+
+            if(this.state.list[this.itemIndex].products != undefined) {
+                this.state.productList += "Product List:";
+                let products = this.state.list[this.itemIndex].products;
+                for(j=0;j<products.length;j++) {
+                    newPL += products[j];
+                    newPL += " ";
+                }
+                this.setState({productList: newPL});
+            }
+        });
         this.mainComp =
-            <Main change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete} isAdmin={this.props.isAdmin}/>;
+            <Main change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete} isAdmin={this.props.isAdmin} login={this.props.login}  addProduct={this.props.addProduct}/>;
     }
 
     render() {
@@ -40,6 +68,7 @@ export default class Edit extends Component<{}> {
                         color="#841584"
                         accessibilityLabel="Update shopping list"
                     />
+
                     <Button
                         onPress={() => {
                             let delfunction = this.props.delete;
@@ -64,6 +93,24 @@ export default class Edit extends Component<{}> {
                         title="Delete"
                         color="#841584"
                         accessibilityLabel="Delete shopping list"
+                    />
+                    <Text>{this.state.productList}</Text>
+                    <TextInput
+                        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+                        onChangeText={(text) => this.setState({product: text})}
+                        value={this.state.product}
+                    />
+                    <Button
+                        onPress={() => {
+                            this.props.addProduct(this.itemIndex, this.state.product);
+                            let newPL = this.state.productList;
+                            newPL+=this.state.product;
+                            newPL+=" ";
+                            this.setState({productList: newPL});
+                        }}
+                        title="Add Product"
+                        color="#841584"
+                        accessibilityLabel="Add Product"
                     />
 
                     <Button
@@ -103,6 +150,21 @@ export default class Edit extends Component<{}> {
                         color="#841584"
                         accessibilityLabel="Update shopping list"
                     />
+
+                    <TextInput
+                        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+                        onChangeText={(text) => this.setState({product: text})}
+                        value={this.state.product}
+                    />
+                    <Button
+                        onPress={() => {
+                            this.props.addProduct(this.itemIndex, this.state.product);
+                        }}
+                        title="Add Product"
+                        color="#841584"
+                        accessibilityLabel="Add Product"
+                    />
+
                     <Button
                         onPress={() => {
                             this.props.change(this.mainComp);

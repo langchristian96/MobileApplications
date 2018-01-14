@@ -22,7 +22,7 @@ export default class SeeAll extends Component<{}> {
             return {key: ("" + (index + 1) + "-" + elem.name)}
         });
         this.mainComp =
-            <Main change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete} isAdmin={this.props.isAdmin}/>;
+            <Main change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete} isAdmin={this.props.isAdmin} login={this.props.login}  addProduct={this.props.addProduct}/>;
         let adm = this.props.isAdmin;
         return (
             <View>
@@ -31,7 +31,7 @@ export default class SeeAll extends Component<{}> {
                     renderItem={({item}) => <TouchableHighlight onPress={() => {
                         let comp
                             = <Edit change={this.props.change} update={this.props.update} add={this.props.add}
-                                    list={this.props.list} elem={item.key} delete={this.props.delete} isAdmin={adm}/>;
+                                    list={this.props.list} elem={item.key} delete={this.props.delete} isAdmin={adm} login={this.props.login}  addProduct={this.props.addProduct}/>;
                         this.props.change(comp);
                     }}>
                         <Text>{item.key}</Text></TouchableHighlight>}
