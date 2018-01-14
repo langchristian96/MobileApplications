@@ -15,7 +15,7 @@ export default class Main extends Component<{}> {
         this.state = {name: 'Shopping List name', description: 'Shopping List Description', time: '',
             chartData: chartData};
         this.comp =
-            <SeeAll change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete}/>
+            <SeeAll change={this.props.change} update={this.props.update} add={this.props.add} list={this.props.list} delete={this.props.delete} isAdmin={this.props.isAdmin}/>
     }
 
 
@@ -135,6 +135,7 @@ export default class Main extends Component<{}> {
 
     render() {
         mock_obj = this.testChartData();
+
         return (
             <View>
                 <TextInput

@@ -33,6 +33,11 @@ export default class App extends Component<{}> {
         AsyncStorage.getItem('test').then((value,err)=>{
             console.log("test: ",value,err);
         });
+        this.administrator = "";
+        this.crtuser = "";
+        firebase.database().ref('admin').on('value', (dataSnapshot)=>{
+            this.administrator = dataSnapshot.val();
+        });
         this.crtindex = 0;
         this.state = {shoppingLists: "", component: ""};
         this.state.shoppingLists = [];
@@ -40,33 +45,47 @@ export default class App extends Component<{}> {
         // this.comp = <Main change={this.changeComponent.bind(this)} update={this.updateShoppingList.bind(this)}
         //                   add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)}/>;
         this.state.component = this.comp;
-        AsyncStorage.getItem('crtindex').then((value, err) => {
-            console.log(err,value);
-            if (!err && value != null) {
-                this.crtindex = JSON.parse(value);
-            }
-            else {
-                AsyncStorage.setItem('crtindex', JSON.stringify(this.crtindex));
-            }
-            firebase.database().ref('crtindex').set(this.crtindex);
-
+        let xx = this;
+        firebase.database().ref('crtindex').on('value', (dataSnapshot)=>{
+            xx.crtindex = dataSnapshot.val();
+            AsyncStorage.setItem('crtindex',dataSnapshot.val());
         });
+        // AsyncStorage.getItem('crtindex').then((value, err) => {
+        //     console.log(err,value);
+        //     if (!err && value != null) {
+        //         this.crtindex = JSON.parse(value);
+        //     }
+        //     else {
+        //         AsyncStorage.setItem('crtindex', JSON.stringify(this.crtindex));
+        //     }
+        //     firebase.database().ref('crtindex').on('value', (dataSnapshot)=>{
+        //         this.crtindex = dataSnapshot.val();
+        //         AsyncStorage.setItem('crtindex',dataSnapshot.val());
+        //     });
+        //
+        // });
         // AsyncStorage.setItem('shoppingLists',JSON.stringify(this.state.shoppingLists));
-        AsyncStorage.getItem('shoppingLists').then((value, err) => {
-            console.log(err,value);
-            if (!err && value != null) {
-                console.log("Expected sls set: ",value);
-                this.setState({shoppingLists: JSON.parse(value)});
-                console.log("New main render list",this.state.shoppingLists);
-                firebase.database().ref('shoppingLists').set(JSON.parse(value));
-            }
-            else {
-                console.log("sl not set");
-                this.setState({shoppingLists: []});
-                AsyncStorage.setItem('shoppingLists',JSON.stringify(this.state.shoppingLists));
-                firebase.database().ref('shoppingLists').set([]);
-            }
+
+        firebase.database().ref('shoppingLists').on('value', (dataSnapshot)=>{
+            console.log("NEW UPDATE SL");
+            let comp = <View/>;
+            xx.setState({shoppingLists: dataSnapshot.val()});
+            AsyncStorage.setItem('shoppingLists',dataSnapshot.val());
         });
+        // AsyncStorage.getItem('shoppingLists').then((value, err) => {
+        //     console.log(err,value);
+        //     if (!err && value != null) {
+        //         console.log("Expected sls set: ",value);
+        //         this.setState({shoppingLists: JSON.parse(value)});
+        //         console.log("New main render list",this.state.shoppingLists);
+        //     }
+        //     else {
+        //         console.log("sl not set");
+        //         this.setState({shoppingLists: []});
+        //         AsyncStorage.setItem('shoppingLists',JSON.stringify(this.state.shoppingLists));
+        //         firebase.database().ref('shoppingLists').set([]);
+        //     }
+        // });
     }
 
     getShoppingList() {
@@ -74,10 +93,15 @@ export default class App extends Component<{}> {
     }
 
     loginUser(username) {
+        this.crtuser = username;
         console.log("login function");
         this.newComp = <Main change={this.changeComponent.bind(this)} update={this.updateShoppingList.bind(this)}
-                             add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)}/>;
+                             add={this.addShoppingList.bind(this)} list={this.state.shoppingLists} delete={this.deleteShoppingList.bind(this)} isAdmin={this.isAdmin.bind(this)}/>;
         this.changeComponent(this.newComp);
+    }
+
+    isAdmin() {
+        return this.crtuser == this.administrator;
     }
 
     updateShoppingList(index, elem) {
